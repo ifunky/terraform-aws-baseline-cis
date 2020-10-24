@@ -4,7 +4,7 @@ data "aws_region" "current" {}
 locals {
   alert_for     = "CloudTrailBreach"
   sns_topic_arn = var.cloudtrail_sns_topic == "" ? aws_sns_topic.sns_topic_default[0].arn : var.cloudtrail_sns_topic
-  endpoints     = "${distinct(compact(concat(list(local.sns_topic_arn), var.additional_endpoint_arns)))}"
+  endpoints     = distinct(compact(concat(list(local.sns_topic_arn), var.additional_endpoint_arns)))
   region        = data.aws_region.current.name  #"${var.region == "" ? data.aws_region.current.name : var.region}"
 
   metric_name = [
