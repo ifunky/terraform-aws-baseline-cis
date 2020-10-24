@@ -52,6 +52,12 @@ variable "vpc_id" {
   description = "VPC ID to configure flow logs for."
 }
 
+variable "vpc_default_network_acl" {
+  type        = string
+  description = "Optional.  VPC default network ACL, typically set when you have removed the default VPCs in an account"
+  default     = ""
+}
+
 variable "log_group_name" {
   default = "vpc-flow-log"
   description = "Log group name for flow logs"

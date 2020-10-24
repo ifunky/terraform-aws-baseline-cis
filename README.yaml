@@ -69,6 +69,7 @@ description: |-
         cloudtrail_sns_topic            = var.cloudtrail_sns_topic
         cloudtrail_bucket_name          = var.cloudtrail_bucket_name
       
+        
         s3_logging_bucket_name          = var.s3_access_bucket_name
         
         tags = {

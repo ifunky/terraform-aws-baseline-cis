@@ -2,6 +2,10 @@
 # Clears rules associated with default resources.
 # --------------------------------------------------------------------------------------------------
 
+locals {
+   default_network_acl_id = var.vpc_default_clear ? aws_default_vpc.default[0].default_network_acl_id : var.vpc_default_network_acl
+}
+
 resource "aws_default_vpc" "default" {
 
   count  = var.vpc_default_clear ? 1 : 0
