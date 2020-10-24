@@ -1,0 +1,94 @@
+---
+# Auto generated - do not modify (see make createdocs/help)!
+
+# Name of this project
+name: terraform-aws-baseline-cis
+title: AWS CIS Baseline
+
+# Build Badges
+badges:
+  - name: "Build Status"
+    image: "https://circleci.com/gh/ifunky/terraform-aws-baseline-cis.svg?style=svg"
+    url: "https://circleci.com/gh/ifunky/terraform-aws-baseline-account"
+  - name: "Latest Version"
+    image: "https://img.shields.io/github/release/ifunky/terraform-aws-baseline-cis.svg"
+    url: "https://github.com/ifunky/terraform-aws-baseline-account/releases"
+
+description: |-
+  This module will set up an AWS account with the a basic secure configuration baseline based on [CIS Amazon Web Services Foundations] v1.2.0.
+
+  [CIS Amazon Web Services Foundations]: https://www.cisecurity.org/benchmark/amazon_web_services/
+
+  ## Features
+
+  ### Identity and Access Management
+
+  - Set up IAM Password complxity policy.
+  - Creates an IAM role for contacting AWS support for incident handling.
+  - Enable AWS Config rules to audit root account status (NOT ENABLED).
+
+  ### Logging & Monitoring
+
+  - Enable CloudTrail in all regions and deliver events to CloudWatch Logs.
+  - CloudTrail logs are encrypted using AWS Key Management Service.
+  - All logs are stored in the S3 bucket with access logging enabled.
+  - Logs are automatically archived into Amazon Glacier after the given period(defaults to 90 days).
+  - Set up CloudWatch alarms to notify you when critical changes happen in your AWS account.
+  - Creates default CloudWatch dashboards based on the security alarms
+  - Enable AWS Config in all regions to automatically take configuration snapshots (NOT ENABLED).
+  - Enable SecurityHub and subscribe CIS benchmark standard.
+
+  ### Networking
+
+  - Remove rules in the default security group.
+  - Enable AWS Config rules to audit unrestricted common ports in Security Group rules.
+  - Enable VPC Flow Logs (REJECT) in all regions.
+
+  ### Cloudwatch Alarms
+  - Set of alarms for each of the CIS recommended checks
+  - SNS alerts for alarms
+  - Clousdwatch dashboards
+
+  > NOTE: This module doesn't create S3 buckets, this is assumed to be in place already
+
+  # How to use this project
+  usage: |-
+    ```hcl
+        module "aws_cis_secure_baseline" {
+        source = "git::https://github.com/ifunky/terraform-aws-baseline-cis.git?ref=master"
+      
+        vpc_log_retention_in_days       = 90
+        vpc_id                          = data.aws_vpc.selected.id
+        
+        region                          = var.region
+        cloudtrail_name                 = var.cloudtrail_name
+        cloudtrail_multi_region         = true
+        cloudtrail_logging              = true
+        cloudtrail_log_file_validation  = true
+        cloudtrail_log_group_name       = var.cloudtrail_log_group_name
+        cloudtrail_sns_topic            = var.cloudtrail_sns_topic
+        cloudtrail_bucket_name          = var.cloudtrail_bucket_name
+      
+        s3_logging_bucket_name          = var.s3_access_bucket_name
+        
+        tags = {
+          Terraform = "true"
+        }
+        }
+    ```
+
+# Include output from terraform-module-inspect
+include:
+  - "docs/targets.md"
+  - "docs/metadata.md"
+
+# List of useful related projects/links
+related:
+  - name: "PolyDev"
+    description: "PolyDev repo and setup guide"
+    url: "https://github.com/ifunky/polydev"
+
+references:
+  - name: "CIS Benchmark"
+    description: "v1.2 PDF"
+    url: "https://d1.awsstatic.com/whitepapers/compliance/AWS_CIS_Foundations_Benchmark.pdf"
