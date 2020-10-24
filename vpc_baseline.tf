@@ -33,7 +33,7 @@ resource "aws_default_network_acl" "default" {
     ignore_changes = [subnet_ids]
   }
 
-  default_network_acl_id = aws_default_vpc.default[0].default_network_acl_id
+  default_network_acl_id = local.default_network_acl_id
   tags = merge(map( "Name", "Default Network ACL"), var.tags)
 
 }
