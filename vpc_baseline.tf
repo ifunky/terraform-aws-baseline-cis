@@ -4,6 +4,8 @@
 
 resource "aws_default_vpc" "default" {
 
+  count  = var.vpc_default_clear ? 1 : 0
+
   tags = merge(
     var.tags,
     { Name = "Default VPC" }
@@ -11,7 +13,8 @@ resource "aws_default_vpc" "default" {
 }
 
 resource "aws_default_route_table" "default" {
-  default_route_table_id = aws_default_vpc.default.default_route_table_id
+  count                  = var.vpc_default_clear ? 1 : 0
+  default_route_table_id = aws_default_vpc.default[count.index].default_route_table_id
 
   tags = {
     Name = "Default Route Table"
@@ -26,7 +29,7 @@ resource "aws_default_network_acl" "default" {
     ignore_changes = [subnet_ids]
   }
 
-  default_network_acl_id = aws_default_vpc.default.default_network_acl_id
+  default_network_acl_id = aws_default_vpc.default[0].default_network_acl_id
   tags = merge(map( "Name", "Default Network ACL"), var.tags)
 
 }

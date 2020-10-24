@@ -43,6 +43,11 @@ variable "support_role_principles" {
   default     = [""]
 }
 
+variable "vpc_default_clear" {
+  description = "Clear any default settings in VPC and RouteTables."
+  default     = true
+}
+
 variable "vpc_id" {
   description = "VPC ID to configure flow logs for."
 }
