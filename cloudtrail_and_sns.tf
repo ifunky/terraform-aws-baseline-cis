@@ -141,6 +141,6 @@ resource "aws_iam_policy" "cloudtrail_access_policy" {
 resource "aws_iam_policy_attachment" "cloudtrail_access_policy_attachment" {
   count      = var.is_managed_by_control_tower ? 1 : 0  
   name       = "${var.cloudtrail_name}-policy-attachment"
-  policy_arn = aws_iam_policy.cloudtrail_access_policy.arn
+  policy_arn = aws_iam_policy.cloudtrail_access_policy[count.index].arn
   roles      = ["${aws_iam_role.cloudtrail_role[count.index].name}"]
 }
