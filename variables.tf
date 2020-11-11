@@ -3,6 +3,12 @@ variable "s3_logging_bucket_name" {
   description = "Bucket name used for S3 access logging"
 }
 
+# Logic flow options
+variable is_managed_by_control_tower {
+  type        = bool
+  description = "Set to true if managed by Control Tower, includes CloudTrail"
+  default     = false
+}
 
 # IAM Base Account Variables
 variable "iam_minimum_password_length" {

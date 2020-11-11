@@ -1,11 +1,12 @@
 resource "aws_cloudtrail" "cloudtrail_default" {
+  count                         = var.is_managed_by_control_tower ? 1 : 0
   name                          = var.cloudtrail_name
   is_multi_region_trail         = var.cloudtrail_multi_region
   s3_bucket_name                = var.cloudtrail_bucket_name
   enable_logging                = var.cloudtrail_logging
   enable_log_file_validation    = var.cloudtrail_log_file_validation
-  cloud_watch_logs_group_arn    = aws_cloudwatch_log_group.log_group_default.arn
-  cloud_watch_logs_role_arn     = aws_iam_role.cloudtrail_role.arn
+  cloud_watch_logs_group_arn    = aws_cloudwatch_log_group.log_group_default[count.index].arn
+  cloud_watch_logs_role_arn     = aws_iam_role.cloudtrail_role[count.index].arn
   kms_key_id                    = aws_kms_key.cloudtrail.arn
   is_organization_trail         = "false"
   include_global_service_events = "true"
@@ -109,6 +110,7 @@ END_OF_POLICY
 }
 
 resource "aws_cloudwatch_log_group" "log_group_default" {
+  count             = var.is_managed_by_control_tower ? 1 : 0
   name              = var.cloudtrail_log_group_name
   retention_in_days = var.cloudwatch_logs_retention_in_days
 
@@ -124,18 +126,21 @@ resource "aws_sns_topic" "sns_topic_default" {
 }
 
 resource "aws_iam_role" "cloudtrail_role" {
+  count              = var.is_managed_by_control_tower ? 1 : 0
   name               = "${var.cloudtrail_name}-role"
   description        = "CloudTrail logging role into CloudWatch "
   assume_role_policy = data.aws_iam_policy_document.cloudtrail_assume_policy.json
 }
 
 resource "aws_iam_policy" "cloudtrail_access_policy" {
+  count  = var.is_managed_by_control_tower ? 1 : 0
   name   = "${var.cloudtrail_name}-policy"
   policy = data.aws_iam_policy_document.cloudtrail_policy.json
 }
 
 resource "aws_iam_policy_attachment" "cloudtrail_access_policy_attachment" {
+  count      = var.is_managed_by_control_tower ? 1 : 0  
   name       = "${var.cloudtrail_name}-policy-attachment"
   policy_arn = aws_iam_policy.cloudtrail_access_policy.arn
-  roles      = ["${aws_iam_role.cloudtrail_role.name}"]
+  roles      = ["${aws_iam_role.cloudtrail_role[count.index].name}"]
 }
