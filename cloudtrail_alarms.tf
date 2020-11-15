@@ -98,7 +98,7 @@ resource "aws_cloudwatch_metric_alarm" "default" {
 }
 
 resource "aws_cloudwatch_dashboard" "main" {
-  count          = var.create_dashboard == "true" ? 1 : 0
+  count          = var.create_dashboard ? 1 : 0
   dashboard_name = "CISBenchmark_Statistics_Combined"
 
   dashboard_body = <<EOF
@@ -126,7 +126,7 @@ resource "aws_cloudwatch_dashboard" "main" {
 }
 
 resource "aws_cloudwatch_dashboard" "main_individual" {
-  count          = var.create_dashboard == "true" ? 1 : 0
+  count          = var.create_dashboard ? 1 : 0
   dashboard_name = "CISBenchmark_Statistics_Individual"
 
   dashboard_body = <<EOF
