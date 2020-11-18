@@ -22,6 +22,7 @@ init:
 validate: init
 	@terraform validate
 	@tflint
+	@tfsec .
 
 createdocs/targets: # Create list of make targets in Markdown format
 	@echo Auto creating README.md....
