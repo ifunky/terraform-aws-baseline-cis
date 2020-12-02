@@ -110,7 +110,7 @@ END_OF_POLICY
 }
 
 resource "aws_cloudwatch_log_group" "log_group_default" {
-  count             = var.is_managed_by_control_tower ? 1 : 0
+  count             = var.is_managed_by_control_tower ? 0 : 1
   name              = var.cloudtrail_log_group_name
   retention_in_days = var.cloudwatch_logs_retention_in_days
 
@@ -127,7 +127,7 @@ resource "aws_sns_topic" "sns_topic_default" {
 }
 
 resource "aws_iam_role" "cloudtrail_role" {
-  count              = var.is_managed_by_control_tower ? 1 : 0
+  count              = var.is_managed_by_control_tower ? 0 : 1
   name               = "${var.cloudtrail_name}-role"
   description        = "CloudTrail logging role into CloudWatch "
   assume_role_policy = data.aws_iam_policy_document.cloudtrail_assume_policy.json
@@ -140,7 +140,7 @@ resource "aws_iam_policy" "cloudtrail_access_policy" {
 }
 
 resource "aws_iam_policy_attachment" "cloudtrail_access_policy_attachment" {
-  count      = var.is_managed_by_control_tower ? 1 : 0  
+  count      = var.is_managed_by_control_tower ? 0 : 1  
   name       = "${var.cloudtrail_name}-policy-attachment"
   policy_arn = aws_iam_policy.cloudtrail_access_policy[count.index].arn
   roles      = ["${aws_iam_role.cloudtrail_role[count.index].name}"]

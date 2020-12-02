@@ -49,6 +49,10 @@ description: |-
   - SNS alerts for alarms
   - Clousdwatch dashboards
 
+  #### Control Tower
+  If your management account is managed by Control Tower it will manage CloudTrail and logging so this module 
+  can be set to ignore these resources with the `is_managed_by_control_tower` setting.
+
   > NOTE: This module doesn't create S3 buckets, this is assumed to be in place already
 
   # How to use this project
@@ -57,6 +61,8 @@ description: |-
         module "aws_cis_secure_baseline" {
         source = "git::https://github.com/ifunky/terraform-aws-baseline-cis.git?ref=master"
       
+       is_managed_by_control_tower     = true 
+
         vpc_log_retention_in_days       = 90
         vpc_id                          = data.aws_vpc.selected.id
         
@@ -68,7 +74,6 @@ description: |-
         cloudtrail_log_group_name       = var.cloudtrail_log_group_name
         cloudtrail_sns_topic            = var.cloudtrail_sns_topic
         cloudtrail_bucket_name          = var.cloudtrail_bucket_name
-      
         
         s3_logging_bucket_name          = var.s3_access_bucket_name
         

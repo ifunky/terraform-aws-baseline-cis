@@ -37,6 +37,10 @@ This module will set up an AWS account with the a basic secure configuration bas
 - SNS alerts for alarms
 - Clousdwatch dashboards
 
+#### Control Tower
+If your management account is managed by Control Tower it will manage CloudTrail and logging so this module 
+can be set to ignore these resources with the `is_managed_by_control_tower` setting.
+
 > NOTE: This module doesn't create S3 buckets, this is assumed to be in place already
 
 # How to use this project
@@ -45,6 +49,8 @@ usage: |-
       module "aws_cis_secure_baseline" {
       source = "git::https://github.com/ifunky/terraform-aws-baseline-cis.git?ref=master"
     
+     is_managed_by_control_tower     = true 
+
       vpc_log_retention_in_days       = 90
       vpc_id                          = data.aws_vpc.selected.id
       
@@ -56,7 +62,7 @@ usage: |-
       cloudtrail_log_group_name       = var.cloudtrail_log_group_name
       cloudtrail_sns_topic            = var.cloudtrail_sns_topic
       cloudtrail_bucket_name          = var.cloudtrail_bucket_name
-    
+      
       s3_logging_bucket_name          = var.s3_access_bucket_name
       
       tags = {
@@ -99,8 +105,8 @@ Provider Requirements:
 * `cloudtrail_name` (default `"vpc-cloudtrail"`): Specifies the name of the trail
 * `cloudtrail_sns_topic` (required): ARN of SNS topic for sending Cloudwatch alarms to.  Useful if you have a centralised account that handles this.
 * `cloudwatch_logs_retention_in_days` (default `90`): Cloudwatch retention in days
-* `create_dashboard` (default `"true"`): When true a dashboard that displays tha statistics as a line graph will be created in CloudWatch
-* `create_sns_topic` (default `"false"`): When true an SNS topic will be created with the name specifed in `cloudtrail_sns_topic` 
+* `create_dashboard` (default `true`): When true a dashboard that displays tha statistics as a line graph will be created in CloudWatch
+* `create_sns_topic` (required): When true an SNS topic will be created with the name specifed in `cloudtrail_sns_topic` 
 * `iam_max_password_age` (default `90`): Maximum password age allowed.  CIS recommends to set 90 days or less.
 * `iam_minimum_password_length` (default `14`): Minimum password length.  CIS recommends a minimum of 14.
 * `iam_password_reuse_prevention` (default `24`): Prevent reuse of passwords.  CIS recommends a minimum of 24.
@@ -109,6 +115,7 @@ Provider Requirements:
 * `iam_require_symbols` (default `true`): Require password to contain symbols.  CIS recommends this to be enabled.
 * `iam_require_uppercase_characters` (default `true`): Require password to contain uppercase letters.  CIS recommends this to be enabled.
 * `iam_support_role_name` (default `"aws-support-role"`): IAM Support role name.
+* `is_managed_by_control_tower` (required): Set to true if managed by Control Tower, includes CloudTrail
 * `key_deletion_window_in_days` (default `10`): Duration in days after which the key is deleted after destruction of the resource, must be between 7 and 30 days. Defaults to 30 days.
 * `log_group_name` (default `"vpc-flow-log"`): Log group name for flow logs
 * `prefix` (default `"vpc"`): The prefix for the resource names. You will probably want to set this to the name of your VPC, if you have multiple.
@@ -117,11 +124,14 @@ Provider Requirements:
 * `support_role_principles` (default `[""]`): List of ARNs (typically from the administration account) that are authorised to assume the suppport role.
 * `tags` (required): A map of tags to add to all resources
 * `traffic_type` (default `"REJECT"`): https://www.terraform.io/docs/providers/aws/r/flow_log.html#traffic_type
+* `vpc_default_clear` (default `true`): Clear any default settings in VPC and RouteTables.
+* `vpc_default_network_acl` (required): Optional.  VPC default network ACL, typically set when you have removed the default VPCs in an account
 * `vpc_id` (required): VPC ID to configure flow logs for.
 * `vpc_log_retention_in_days` (required): Number of days to retain logs for. CIS recommends 365 days.  Possible values are: 0, 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653. Set to 0 to keep logs indefinitely.
 
 ## Output Values
 * `log_group_name`
+* `sns_arn`: Arn of the SNS topic
 * `support_iam_role_arn`: The ARN of the IAM role used for the support user.
 * `support_iam_role_name`: The name of the IAM role used for the support user.
 
@@ -133,7 +143,10 @@ Provider Requirements:
 * `aws_cloudwatch_log_group.log_group_default` from `aws`
 * `aws_cloudwatch_log_metric_filter.default` from `aws`
 * `aws_cloudwatch_metric_alarm.default` from `aws`
+* `aws_default_network_acl.default` from `aws`
+* `aws_default_route_table.default` from `aws`
 * `aws_default_security_group.default` from `aws`
+* `aws_default_vpc.default` from `aws`
 * `aws_flow_log.vpc_flow_log` from `aws`
 * `aws_iam_account_password_policy.iam_password_policy` from `aws`
 * `aws_iam_policy.cloudtrail_access_policy` from `aws`
@@ -144,6 +157,7 @@ Provider Requirements:
 * `aws_iam_role_policy.log_policy` from `aws`
 * `aws_iam_role_policy_attachment.support_policy` from `aws`
 * `aws_kms_key.cloudtrail` from `aws`
+* `aws_security_group.allow_tls` from `aws`
 * `aws_sns_topic.sns_topic_default` from `aws`
 
 ## Data Resources
