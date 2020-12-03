@@ -137,7 +137,8 @@ variable "cloudtrail_sns_topic" {
 
 variable "cloudtrail_bucket_name" {
   type        = string
-  description = "The name of the S3 bucket to be created"
+  description = "The name of the S3 bucket to be created.  Leave blank if using Control Tower."
+  default     = ""
 }
 
 variable "cloudtrail_metric_namespace" {
