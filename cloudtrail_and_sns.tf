@@ -1,5 +1,5 @@
 resource "aws_cloudtrail" "cloudtrail_default" {
-  count                         = var.is_managed_by_control_tower ? 1 : 0
+  count                         = var.is_managed_by_control_tower ? 0 : 1
   name                          = var.cloudtrail_name
   is_multi_region_trail         = var.cloudtrail_multi_region
   s3_bucket_name                = var.cloudtrail_bucket_name
@@ -134,7 +134,7 @@ resource "aws_iam_role" "cloudtrail_role" {
 }
 
 resource "aws_iam_policy" "cloudtrail_access_policy" {
-  count  = var.is_managed_by_control_tower ? 1 : 0
+  count  = var.is_managed_by_control_tower ? 0 : 1
   name   = "${var.cloudtrail_name}-policy"
   policy = data.aws_iam_policy_document.cloudtrail_policy.json
 }
