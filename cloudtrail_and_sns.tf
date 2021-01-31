@@ -22,7 +22,7 @@ resource "aws_cloudtrail" "cloudtrail_default" {
     }
   }  
 
-  tags = merge(map( "Name", "${var.cloudtrail_log_group_name}"), var.tags )
+  tags = merge(map( "Name", var.cloudtrail_log_group_name), var.tags )
 }
 
 # --------------------------------------------------------------------------------------------------
