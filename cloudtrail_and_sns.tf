@@ -115,7 +115,7 @@ resource "aws_cloudwatch_log_group" "log_group_default" {
   retention_in_days = var.cloudwatch_logs_retention_in_days
 
 
-  tags = merge(map( "Name", "${var.cloudtrail_name}"), var.tags )
+  tags = merge(map( "Name", var.cloudtrail_name), var.tags )
 
 }
 
@@ -143,5 +143,5 @@ resource "aws_iam_policy_attachment" "cloudtrail_access_policy_attachment" {
   count      = var.is_managed_by_control_tower ? 0 : 1  
   name       = "${var.cloudtrail_name}-policy-attachment"
   policy_arn = aws_iam_policy.cloudtrail_access_policy[count.index].arn
-  roles      = ["${aws_iam_role.cloudtrail_role[count.index].name}"]
+  roles      = [aws_iam_role.cloudtrail_role[count.index].name]
 }
