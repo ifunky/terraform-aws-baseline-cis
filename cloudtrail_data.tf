@@ -26,9 +26,9 @@ data "aws_iam_policy_document" "cloudtrail_policy" {
   }
 }
 
-# NOT USED - CAused an error first time around so used inline policy
 data "aws_iam_policy_document" "cloudtrail_alarm_policy" {
   count  = var.create_sns_topic ? 1 : 0
+
   statement {
     effect = "Allow"
 
@@ -56,6 +56,25 @@ data "aws_iam_policy_document" "cloudtrail_alarm_policy" {
       variable = "AWS:SourceOwner"
       values   = [data.aws_caller_identity.current_user.account_id]
     }
+  }
+
+  statement {
+    actions = [
+      "sns:Publish"
+    ]
+
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["events.amazonaws.com"]
+    }
+
+    resources = [
+      "arn:aws:sns:${var.region}:${data.aws_caller_identity.current_user.account_id}:${var.cloudtrail_sns_topic}"
+    ]
+
+    sid = "TrustCWToPublishEvents"
   }
 }
 
