@@ -10,10 +10,12 @@
 .terraform/
 .vagrant/
 testresults/
-test-results/
 
 # SSH Keys
 *.pem
+
+# Test reults
+test-results/*.xml
 
 # Backup files
 *.bak
