@@ -22,7 +22,7 @@ init:
 validate: init
 	@terraform validate
 	@tflint
-	@checkov -d . -o junitxml -o > test-results/results.xml || true
+	@checkov -d . -s -o junitxml > test-results/results.xml 
 	@checkov -d . --compact 
 
 createdocs/targets: # Create list of make targets in Markdown format
