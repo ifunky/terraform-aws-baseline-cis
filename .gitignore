@@ -10,6 +10,7 @@
 .terraform/
 .vagrant/
 testresults/
+test-results/
 
 # SSH Keys
 *.pem
