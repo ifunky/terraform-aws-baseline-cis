@@ -121,7 +121,7 @@ data "aws_iam_policy_document" "cloudtrail_kms" {
     condition {
       test     = "StringEquals"
       variable = "kms:CallerAccount"
-      values   = ["${data.aws_caller_identity.current_user.account_id}"]
+      values   = [data.aws_caller_identity.current_user.account_id]
     } 
     condition {
       test     = "StringLike"
@@ -149,7 +149,7 @@ data "aws_iam_policy_document" "cloudtrail_kms" {
     condition {
       test     = "StringEquals"
       variable = "kms:CallerAccount"
-      values   = ["${data.aws_caller_identity.current_user.account_id}"]
+      values   = [data.aws_caller_identity.current_user.account_id]
     }
   }
   statement {
@@ -172,7 +172,7 @@ data "aws_iam_policy_document" "cloudtrail_kms" {
     condition {
       test     = "StringEquals"
       variable = "kms:CallerAccount"
-      values   = ["${data.aws_caller_identity.current_user.account_id}"]
+      values   = [data.aws_caller_identity.current_user.account_id]
     }
   }
 }

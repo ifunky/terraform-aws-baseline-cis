@@ -15,7 +15,7 @@ This module will set up an AWS account with the a basic secure configuration bas
 - Creates an IAM role for contacting AWS support for incident handling.
 - Enable AWS Config rules to audit root account status (NOT ENABLED).
 
-### Logging & Monitoring
+### Logging & Monitoring/
 
 - Enable CloudTrail in all regions and deliver events to CloudWatch Logs.
 - CloudTrail logs are encrypted using AWS Key Management Service.
