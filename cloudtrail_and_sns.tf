@@ -120,7 +120,7 @@ resource "aws_cloudwatch_log_group" "log_group_default" {
 }
 
 resource "aws_sns_topic" "sns_topic_default" {
-  #tfsec:ignore:AWS016
+  #checkov:skip=CKV_AWS_26:Not required
   count  = var.create_sns_topic ? 1 : 0
   name   = var.cloudtrail_sns_topic
   policy = data.aws_iam_policy_document.cloudtrail_alarm_policy[count.index].json
