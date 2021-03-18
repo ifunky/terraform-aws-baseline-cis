@@ -1,4 +1,4 @@
-/*resource "aws_security_group" "ssh2" {
+resource "aws_security_group" "ssh2" {
   name        = "sg-ssh"
   description = "Allow SSH inbound traffic"
   vpc_id      = var.vpc_id
@@ -15,4 +15,3 @@
     Name = "allow_ssh"
   }
 }
-*/
