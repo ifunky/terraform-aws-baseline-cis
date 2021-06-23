@@ -1,4 +1,5 @@
-resource "aws_security_group" "ssh2" {
+/*
+ resource "aws_security_group" "ssh2" {
   name        = "sg_ssh"
   description = "Allow SSH inbound traffic"
   vpc_id      = module.vpc.vpc_id
@@ -16,7 +17,7 @@ resource "aws_security_group" "ssh2" {
   }
 }
 
-/*
+
 resource "aws_s3_bucket" "badbucket" {
   bucket = "qwerty-tf-test-bucket"
   acl    = "public-read"
