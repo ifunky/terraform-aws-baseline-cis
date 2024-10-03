@@ -34,12 +34,12 @@ resource "aws_default_network_acl" "default" {
   }
 
   default_network_acl_id = local.default_network_acl_id
-  tags = merge(map( "Name", "Default Network ACL"), var.tags)
+  tags = merge({ "Name" = "Default Network ACL" }, var.tags)
 
 }
 
 
 resource "aws_default_security_group" "default" {
   vpc_id = var.vpc_id
-  tags = merge(map( "Name", "Default Security Group"), var.tags)
+  tags = merge({ "Name" = "Default Security Group" }, var.tags)
 }

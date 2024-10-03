@@ -22,7 +22,7 @@ resource "aws_cloudtrail" "cloudtrail_default" {
     }
   }  
 
-  tags = merge(map( "Name", var.cloudtrail_log_group_name), var.tags )
+  tags = merge({ "Name" = var.cloudtrail_log_group_name }, var.tags)
 }
 
 # --------------------------------------------------------------------------------------------------
@@ -114,8 +114,7 @@ resource "aws_cloudwatch_log_group" "log_group_default" {
   name              = var.cloudtrail_log_group_name
   retention_in_days = var.cloudwatch_logs_retention_in_days
 
-
-  tags = merge(map( "Name", var.cloudtrail_name), var.tags )
+  tags = merge({ "Name" = var.cloudtrail_name }, var.tags)
 
 }
 
