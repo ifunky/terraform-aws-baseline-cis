@@ -5,8 +5,8 @@ resource "aws_cloudtrail" "cloudtrail_default" {
   s3_bucket_name                = var.cloudtrail_bucket_name
   enable_logging                = var.cloudtrail_logging
   enable_log_file_validation    = var.cloudtrail_log_file_validation
-  cloud_watch_logs_group_arn    = aws_cloudwatch_log_group.log_group_default[count.index].arn
-  cloud_watch_logs_role_arn     = aws_iam_role.cloudtrail_role[count.index].arn
+  # cloud_watch_logs_group_arn    = aws_cloudwatch_log_group.log_group_default[count.index].arn
+  # cloud_watch_logs_role_arn     = aws_iam_role.cloudtrail_role[count.index].arn
   kms_key_id                    = aws_kms_key.cloudtrail.arn
   is_organization_trail         = "false"
   include_global_service_events = "true"
@@ -86,7 +86,7 @@ resource "aws_kms_key" "cloudtrail" {
             "Action": "kms:CreateAlias",
             "Resource": "*",
             "Condition": {"StringEquals": {
-                "kms:ViaService": "ec2.${var.region}.amazonaws.com",
+                "kms:ViaService": "ec2.${local.region}.amazonaws.com",
                 "kms:CallerAccount": "${data.aws_caller_identity.current_user.account_id}"
             }}
         },

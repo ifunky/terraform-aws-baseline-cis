@@ -16,13 +16,13 @@ data "aws_iam_policy_document" "cloudtrail_policy" {
   statement {
     effect    = "Allow"
     actions   = ["logs:CreateLogStream"]
-    resources = ["arn:aws:logs:${var.region}:${data.aws_caller_identity.current_user.account_id}:log-group:*:log-stream:*"]
+    resources = ["arn:aws:logs:${local.region}:${data.aws_caller_identity.current_user.account_id}:log-group:*:log-stream:*"]
   }
 
   statement {
     effect    = "Allow"
     actions   = ["logs:PutLogEvents"]
-    resources = ["arn:aws:logs:${var.region}:${data.aws_caller_identity.current_user.account_id}:log-group:*:log-stream:*"]
+    resources = ["arn:aws:logs:${local.region}:${data.aws_caller_identity.current_user.account_id}:log-group:*:log-stream:*"]
   }
 }
 
@@ -49,7 +49,7 @@ data "aws_iam_policy_document" "cloudtrail_alarm_policy" {
       "SNS:Receive",
     ]
 
-    resources = ["arn:aws:sns:${var.region}:${data.aws_caller_identity.current_user.account_id}:${var.cloudtrail_sns_topic}"]
+    resources = ["arn:aws:sns:${local.region}:${data.aws_caller_identity.current_user.account_id}:${var.cloudtrail_sns_topic}"]
 
     condition {
       test     = "StringEquals"
@@ -71,7 +71,7 @@ data "aws_iam_policy_document" "cloudtrail_alarm_policy" {
     }
 
     resources = [
-      "arn:aws:sns:${var.region}:${data.aws_caller_identity.current_user.account_id}:${var.cloudtrail_sns_topic}"
+      "arn:aws:sns:${local.region}:${data.aws_caller_identity.current_user.account_id}:${var.cloudtrail_sns_topic}"
     ]
 
     sid = "TrustCWToPublishEvents"
@@ -144,7 +144,7 @@ data "aws_iam_policy_document" "cloudtrail_kms" {
     condition {
       test     = "StringEquals"
       variable = "kms:ViaService"
-      values   = ["ec2.${var.region}.amazonaws.com"]
+      values   = ["ec2.${local.region}.amazonaws.com"]
     }     
     condition {
       test     = "StringEquals"
