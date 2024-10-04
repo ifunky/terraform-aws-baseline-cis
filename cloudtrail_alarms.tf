@@ -67,7 +67,7 @@ resource "aws_cloudwatch_log_metric_filter" "default" {
   count          = length(local.filter_pattern)
   name           = "${local.metric_name[count.index]}-filter"
   pattern        = local.filter_pattern[count.index]
-  log_group_name = var.cloudtrail_log_group_name
+  log_group_name = aws_cloudtrail.cloudtrail_default[0].name 
 
   metric_transformation {
     name      = local.metric_name[count.index]
