@@ -133,7 +133,7 @@ variable "cloudtrail_log_file_validation" {
 variable "cloudtrail_log_group_name" {
   type        = string
   description = "The name of the log group to be created"
-  default     = "vpc-cloudtrail-log"
+  default     = "/aws/cloudtrail/CloudTrail-logs"
 }
 
 variable "cloudtrail_sns_topic" {
