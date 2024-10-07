@@ -5,7 +5,7 @@ resource "aws_cloudtrail" "cloudtrail_default" {
   s3_bucket_name                = aws_s3_bucket.default.id
   enable_logging                = var.cloudtrail_logging
   enable_log_file_validation    = var.cloudtrail_log_file_validation
-  # cloud_watch_logs_group_arn    = aws_cloudwatch_log_group.log_group_default[count.index].arn
+  cloud_watch_logs_group_arn    = aws_cloudwatch_log_group.log_group_default[count.index].arn
   # cloud_watch_logs_role_arn     = aws_iam_role.cloudtrail_role[count.index].arn
   kms_key_id                    = aws_kms_key.cloudtrail.arn
   is_organization_trail         = "false"
