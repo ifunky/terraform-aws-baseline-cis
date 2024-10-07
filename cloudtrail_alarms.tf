@@ -64,7 +64,7 @@ locals {
 }
 
 resource "aws_cloudwatch_log_metric_filter" "default" {
-  count          = length(local.filter_pattern)
+  count = length(local.filter_pattern) > 0 && var.is_managed_by_control_tower == false ? 1 : 0
   name           = "${local.metric_name[count.index]}-filter"
   pattern        = local.filter_pattern[count.index]
   log_group_name = aws_cloudtrail.cloudtrail_default[0].name 
@@ -77,7 +77,7 @@ resource "aws_cloudwatch_log_metric_filter" "default" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "default" {
-  count               = length(local.filter_pattern)
+  count = length(local.filter_pattern) > 0 && var.is_managed_by_control_tower == false ? 1 : 0
   alarm_name          = "${local.metric_name[count.index]}-alarm"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
