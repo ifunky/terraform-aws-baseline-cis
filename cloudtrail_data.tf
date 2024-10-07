@@ -15,15 +15,20 @@ data "aws_iam_policy_document" "cloudtrail_policy" {
   statement {
     effect    = "Allow"
     actions   = ["logs:CreateLogStream"]
-    resources = ["arn:aws:logs:${local.region}:${data.aws_caller_identity.current.account_id}:log-group:*:log-stream:*"]
+    resources = [
+      "arn:aws:logs:${local.region}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.log_group_default[0].name}:log-stream:*"
+    ]
   }
 
   statement {
     effect    = "Allow"
     actions   = ["logs:PutLogEvents"]
-    resources = ["arn:aws:logs:${local.region}:${data.aws_caller_identity.current.account_id}:log-group:*:log-stream:*"]
+    resources = [
+      "arn:aws:logs:${local.region}:${data.aws_caller_identity.current.account_id}:log-group:${aws_cloudwatch_log_group.log_group_default[0].name}:log-stream:*"
+    ]
   }
 }
+
 
 data "aws_iam_policy_document" "cloudtrail_alarm_policy" {
   count  = var.create_sns_topic ? 1 : 0
