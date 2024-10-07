@@ -88,6 +88,12 @@ variable "traffic_type" {
 }
 
 # Cloudtrail vars
+variable "create_log_group" {
+  type        = bool
+  description = "True if a CloudWatch log group and metrics should be created. False otherwise"
+  default     = true
+}
+
 
 variable "cloudwatch_logs_retention_in_days" {
   type        = number  

@@ -15,7 +15,7 @@ This module will set up an AWS account with the a basic secure configuration bas
 - Creates an IAM role for contacting AWS support for incident handling.
 - Enable AWS Config rules to audit root account status (NOT ENABLED).
 
-### Logging & Monitoring/
+### Logging & Monitoring
 
 - Enable CloudTrail in all regions and deliver events to CloudWatch Logs.
 - CloudTrail logs are encrypted using AWS Key Management Service.
@@ -89,24 +89,25 @@ polydev                        Run PolyDev interactive shell to start developing
 # Module Specifics
 
 Core Version Constraints:
-* `~> 0.12.23`
+* `>= 1.0`
 
 Provider Requirements:
-* **aws:** `~> 2.20`
+* **aws (`hashicorp/aws`):** `~> 5.0`
 
 ## Input Variables
-* `additional_endpoint_arns` (required): Any alert endpoints, such as autoscaling, or app scaling endpoint arns that will respond to an alert
-* `cloudtrail_bucket_name` (required): The name of the S3 bucket to be created
+* `additional_endpoint_arns` (default `[]`): Any alert endpoints, such as autoscaling, or app scaling endpoint arns that will respond to an alert
+* `cloudtrail_bucket_name` (default `""`): The name of the S3 bucket to be created.  Leave blank if using Control Tower.
 * `cloudtrail_log_file_validation` (default `true`): Specifies whether log file integrity validation is enabled
-* `cloudtrail_log_group_name` (default `"vpc-cloudtrail-log"`): The name of the log group to be created
+* `cloudtrail_log_group_name` (default `"/aws/cloudtrail/CloudTrail-logs"`): The name of the log group to be created
 * `cloudtrail_logging` (default `true`): Enables logging for the trail
 * `cloudtrail_metric_namespace` (default `"CISBenchmark"`): A namespace for grouping all of the metrics together
 * `cloudtrail_multi_region` (default `true`): Specifies whether the trail is created in the current region or in all regions
 * `cloudtrail_name` (default `"vpc-cloudtrail"`): Specifies the name of the trail
-* `cloudtrail_sns_topic` (required): ARN of SNS topic for sending Cloudwatch alarms to.  Useful if you have a centralised account that handles this.
+* `cloudtrail_sns_topic` (default `""`): ARN of SNS topic for sending Cloudwatch alarms to.  Useful if you have a centralised account that handles this.
 * `cloudwatch_logs_retention_in_days` (default `90`): Cloudwatch retention in days
 * `create_dashboard` (default `true`): When true a dashboard that displays tha statistics as a line graph will be created in CloudWatch
-* `create_sns_topic` (required): When true an SNS topic will be created with the name specifed in `cloudtrail_sns_topic` 
+* `create_log_group` (default `true`): True if a CloudWatch log group and metrics should be created. False otherwise
+* `create_sns_topic` (default `false`): When true an SNS topic will be created with the name specifed in `cloudtrail_sns_topic` 
 * `iam_max_password_age` (default `90`): Maximum password age allowed.  CIS recommends to set 90 days or less.
 * `iam_minimum_password_length` (default `14`): Minimum password length.  CIS recommends a minimum of 14.
 * `iam_password_reuse_prevention` (default `24`): Prevent reuse of passwords.  CIS recommends a minimum of 24.
@@ -115,17 +116,15 @@ Provider Requirements:
 * `iam_require_symbols` (default `true`): Require password to contain symbols.  CIS recommends this to be enabled.
 * `iam_require_uppercase_characters` (default `true`): Require password to contain uppercase letters.  CIS recommends this to be enabled.
 * `iam_support_role_name` (default `"aws-support-role"`): IAM Support role name.
-* `is_managed_by_control_tower` (required): Set to true if managed by Control Tower, includes CloudTrail
+* `is_managed_by_control_tower` (default `false`): Set to true if managed by Control Tower, includes CloudTrail
 * `key_deletion_window_in_days` (default `10`): Duration in days after which the key is deleted after destruction of the resource, must be between 7 and 30 days. Defaults to 30 days.
 * `log_group_name` (default `"vpc-flow-log"`): Log group name for flow logs
 * `prefix` (default `"vpc"`): The prefix for the resource names. You will probably want to set this to the name of your VPC, if you have multiple.
 * `region` (required): The AWS regions where resources are created
-* `s3_logging_bucket_name` (required): Bucket name used for S3 access logging
-* `support_role_principles` (default `[""]`): List of ARNs (typically from the administration account) that are authorised to assume the suppport role.
-* `tags` (required): A map of tags to add to all resources
+* `tags` (default `{}`): A map of tags to add to all resources
 * `traffic_type` (default `"REJECT"`): https://www.terraform.io/docs/providers/aws/r/flow_log.html#traffic_type
 * `vpc_default_clear` (default `true`): Clear any default settings in VPC and RouteTables.
-* `vpc_default_network_acl` (required): Optional.  VPC default network ACL, typically set when you have removed the default VPCs in an account
+* `vpc_default_network_acl` (default `""`): Optional.  VPC default network ACL, typically set when you have removed the default VPCs in an account
 * `vpc_id` (required): VPC ID to configure flow logs for.
 * `vpc_log_retention_in_days` (required): Number of days to retain logs for. CIS recommends 365 days.  Possible values are: 0, 1, 3, 5, 7, 14, 30, 60, 90, 120, 150, 180, 365, 400, 545, 731, 1827, and 3653. Set to 0 to keep logs indefinitely.
 
@@ -143,7 +142,6 @@ Provider Requirements:
 * `aws_cloudwatch_log_group.log_group_default` from `aws`
 * `aws_cloudwatch_log_metric_filter.default` from `aws`
 * `aws_cloudwatch_metric_alarm.default` from `aws`
-* `aws_default_network_acl.default` from `aws`
 * `aws_default_route_table.default` from `aws`
 * `aws_default_security_group.default` from `aws`
 * `aws_default_vpc.default` from `aws`
@@ -157,19 +155,21 @@ Provider Requirements:
 * `aws_iam_role_policy.log_policy` from `aws`
 * `aws_iam_role_policy_attachment.support_policy` from `aws`
 * `aws_kms_key.cloudtrail` from `aws`
-* `aws_security_group.allow_tls` from `aws`
+* `aws_s3_bucket.default` from `aws`
+* `aws_s3_bucket_policy.default` from `aws`
 * `aws_sns_topic.sns_topic_default` from `aws`
 
 ## Data Resources
 * `data.aws_caller_identity.current` from `aws`
-* `data.aws_caller_identity.current_user` from `aws`
 * `data.aws_iam_policy_document.assume_role_policy` from `aws`
 * `data.aws_iam_policy_document.cloudtrail_alarm_policy` from `aws`
 * `data.aws_iam_policy_document.cloudtrail_assume_policy` from `aws`
 * `data.aws_iam_policy_document.cloudtrail_kms` from `aws`
 * `data.aws_iam_policy_document.cloudtrail_policy` from `aws`
+* `data.aws_iam_policy_document.default` from `aws`
 * `data.aws_iam_policy_document.log_policy` from `aws`
 * `data.aws_iam_policy_document.support_role_policy` from `aws`
+* `data.aws_partition.current` from `aws`
 * `data.aws_region.current` from `aws`
 
 
