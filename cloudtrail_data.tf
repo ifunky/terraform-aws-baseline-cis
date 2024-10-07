@@ -1,4 +1,3 @@
-data "aws_caller_identity" "current_user" {}
 
 data "aws_iam_policy_document" "cloudtrail_assume_policy" {
   statement {
@@ -16,13 +15,13 @@ data "aws_iam_policy_document" "cloudtrail_policy" {
   statement {
     effect    = "Allow"
     actions   = ["logs:CreateLogStream"]
-    resources = ["arn:aws:logs:${local.region}:${data.aws_caller_identity.current_user.account_id}:log-group:*:log-stream:*"]
+    resources = ["arn:aws:logs:${local.region}:${data.aws_caller_identity.current.account_id}:log-group:*:log-stream:*"]
   }
 
   statement {
     effect    = "Allow"
     actions   = ["logs:PutLogEvents"]
-    resources = ["arn:aws:logs:${local.region}:${data.aws_caller_identity.current_user.account_id}:log-group:*:log-stream:*"]
+    resources = ["arn:aws:logs:${local.region}:${data.aws_caller_identity.current.account_id}:log-group:*:log-stream:*"]
   }
 }
 
@@ -49,12 +48,12 @@ data "aws_iam_policy_document" "cloudtrail_alarm_policy" {
       "SNS:Receive",
     ]
 
-    resources = ["arn:aws:sns:${local.region}:${data.aws_caller_identity.current_user.account_id}:${var.cloudtrail_sns_topic}"]
+    resources = ["arn:aws:sns:${local.region}:${data.aws_caller_identity.current.account_id}:${var.cloudtrail_sns_topic}"]
 
     condition {
       test     = "StringEquals"
       variable = "AWS:SourceOwner"
-      values   = [data.aws_caller_identity.current_user.account_id]
+      values   = [data.aws_caller_identity.current.account_id]
     }
   }
 
@@ -71,7 +70,7 @@ data "aws_iam_policy_document" "cloudtrail_alarm_policy" {
     }
 
     resources = [
-      "arn:aws:sns:${local.region}:${data.aws_caller_identity.current_user.account_id}:${var.cloudtrail_sns_topic}"
+      "arn:aws:sns:${local.region}:${data.aws_caller_identity.current.account_id}:${var.cloudtrail_sns_topic}"
     ]
 
     sid = "TrustCWToPublishEvents"
@@ -87,7 +86,7 @@ data "aws_iam_policy_document" "cloudtrail_kms" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current_user.account_id}:root"]
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
     }
 
     actions   = ["kms:*"]
@@ -121,12 +120,12 @@ data "aws_iam_policy_document" "cloudtrail_kms" {
     condition {
       test     = "StringEquals"
       variable = "kms:CallerAccount"
-      values   = [data.aws_caller_identity.current_user.account_id]
+      values   = [data.aws_caller_identity.current.account_id]
     } 
     condition {
       test     = "StringLike"
       variable = "kms:EncryptionContext:aws:cloudtrail:arn"
-      values   = ["arn:aws:cloudtrail:*:${data.aws_caller_identity.current_user.account_id}}:trail/*"]
+      values   = ["arn:aws:cloudtrail:*:${data.aws_caller_identity.current.account_id}}:trail/*"]
     }        
   }
 
@@ -149,7 +148,7 @@ data "aws_iam_policy_document" "cloudtrail_kms" {
     condition {
       test     = "StringEquals"
       variable = "kms:CallerAccount"
-      values   = [data.aws_caller_identity.current_user.account_id]
+      values   = [data.aws_caller_identity.current.account_id]
     }
   }
   statement {
@@ -167,12 +166,12 @@ data "aws_iam_policy_document" "cloudtrail_kms" {
     condition {
       test     = "StringLike"
       variable = "kms:EncryptionContext:aws:cloudtrail:arn"
-      values   = ["arn:aws:cloudtrail:*:${data.aws_caller_identity.current_user.account_id}:trail/*"]
+      values   = ["arn:aws:cloudtrail:*:${data.aws_caller_identity.current.account_id}:trail/*"]
     }     
     condition {
       test     = "StringEquals"
       variable = "kms:CallerAccount"
-      values   = [data.aws_caller_identity.current_user.account_id]
+      values   = [data.aws_caller_identity.current.account_id]
     }
   }
 }

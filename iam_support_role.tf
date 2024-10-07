@@ -6,7 +6,7 @@ data "aws_iam_policy_document" "support_role_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current_user.account_id}:root"]  #"${var.support_role_principles}"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]  #"${var.support_role_principles}"
     }
   }
 }

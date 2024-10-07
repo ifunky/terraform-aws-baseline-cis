@@ -2,7 +2,7 @@ resource "aws_cloudtrail" "cloudtrail_default" {
   count                         = var.is_managed_by_control_tower ? 0 : 1
   name                          = var.cloudtrail_name
   is_multi_region_trail         = var.cloudtrail_multi_region
-  s3_bucket_name                = var.cloudtrail_bucket_name
+  s3_bucket_name                = aws_s3_bucket.default.id
   enable_logging                = var.cloudtrail_logging
   enable_log_file_validation    = var.cloudtrail_log_file_validation
   # cloud_watch_logs_group_arn    = aws_cloudwatch_log_group.log_group_default[count.index].arn
@@ -11,7 +11,6 @@ resource "aws_cloudtrail" "cloudtrail_default" {
   is_organization_trail         = "false"
   include_global_service_events = "true"
   
-
   event_selector {
     read_write_type           = "All"
     include_management_events = true
@@ -24,6 +23,61 @@ resource "aws_cloudtrail" "cloudtrail_default" {
 
   tags = merge({ "Name" = var.cloudtrail_log_group_name }, var.tags)
 }
+
+resource "aws_s3_bucket" "default" {
+  bucket        = var.cloudtrail_bucket_name
+  force_destroy = true
+}
+
+data "aws_iam_policy_document" "default" {
+  statement {
+    sid    = "AWSCloudTrailAclCheck"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions   = ["s3:GetBucketAcl"]
+    resources = [aws_s3_bucket.default.arn]
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:${data.aws_partition.current.partition}:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/${var.cloudtrail_name}"]
+    }
+  }
+
+  statement {
+    sid    = "AWSCloudTrailWrite"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions   = ["s3:PutObject"]
+    resources = ["${aws_s3_bucket.default.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "s3:x-amz-acl"
+      values   = ["bucket-owner-full-control"]
+    }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:${data.aws_partition.current.partition}:cloudtrail:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:trail/${var.cloudtrail_name}"]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "default" {
+  bucket = aws_s3_bucket.default.id
+  policy = data.aws_iam_policy_document.default.json
+}
+
 
 # --------------------------------------------------------------------------------------------------
 # KMS Key to encrypt CloudTrail events.
@@ -45,7 +99,7 @@ resource "aws_kms_key" "cloudtrail" {
             "Sid": "Enable IAM User Permissions",
             "Effect": "Allow",
             "Principal": {"AWS": [
-                "arn:aws:iam::${data.aws_caller_identity.current_user.account_id}:root"
+                "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
             ]},
             "Action": "kms:*",
             "Resource": "*"
@@ -56,7 +110,7 @@ resource "aws_kms_key" "cloudtrail" {
             "Principal": {"Service": ["cloudtrail.amazonaws.com"]},
             "Action": "kms:GenerateDataKey*",
             "Resource": "*",
-            "Condition": {"StringLike": {"kms:EncryptionContext:aws:cloudtrail:arn": "arn:aws:cloudtrail:*:${data.aws_caller_identity.current_user.account_id}:trail/*"}}
+            "Condition": {"StringLike": {"kms:EncryptionContext:aws:cloudtrail:arn": "arn:aws:cloudtrail:*:${data.aws_caller_identity.current.account_id}:trail/*"}}
         },
         {
             "Sid": "Allow CloudTrail to describe key",
@@ -75,8 +129,8 @@ resource "aws_kms_key" "cloudtrail" {
             ],
             "Resource": "*",
             "Condition": {
-                "StringEquals": {"kms:CallerAccount": "${data.aws_caller_identity.current_user.account_id}"},
-                "StringLike": {"kms:EncryptionContext:aws:cloudtrail:arn": "arn:aws:cloudtrail:*:${data.aws_caller_identity.current_user.account_id}:trail/*"}
+                "StringEquals": {"kms:CallerAccount": "${data.aws_caller_identity.current.account_id}"},
+                "StringLike": {"kms:EncryptionContext:aws:cloudtrail:arn": "arn:aws:cloudtrail:*:${data.aws_caller_identity.current.account_id}:trail/*"}
             }
         },
         {
@@ -87,7 +141,7 @@ resource "aws_kms_key" "cloudtrail" {
             "Resource": "*",
             "Condition": {"StringEquals": {
                 "kms:ViaService": "ec2.${local.region}.amazonaws.com",
-                "kms:CallerAccount": "${data.aws_caller_identity.current_user.account_id}"
+                "kms:CallerAccount": "${data.aws_caller_identity.current.account_id}"
             }}
         },
         {
@@ -100,8 +154,8 @@ resource "aws_kms_key" "cloudtrail" {
             ],
             "Resource": "*",
             "Condition": {
-                "StringEquals": {"kms:CallerAccount": "${data.aws_caller_identity.current_user.account_id}"},
-                "StringLike": {"kms:EncryptionContext:aws:cloudtrail:arn": "arn:aws:cloudtrail:*:${data.aws_caller_identity.current_user.account_id}:trail/*"}
+                "StringEquals": {"kms:CallerAccount": "${data.aws_caller_identity.current.account_id}"},
+                "StringLike": {"kms:EncryptionContext:aws:cloudtrail:arn": "arn:aws:cloudtrail:*:${data.aws_caller_identity.current.account_id}:trail/*"}
             }
         }
     ]

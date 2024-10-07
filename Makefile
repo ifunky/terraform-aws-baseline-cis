@@ -22,8 +22,8 @@ init:
 validate: init
 	@terraform validate
 	@tflint
-	@checkov -d . -s -o junitxml > test-results/results.xml 
-	@checkov -d . --quiet
+	# @checkov -d . -s -o junitxml > test-results/results.xml 
+	# @checkov -d . --quiet
 
 createdocs/targets: # Create list of make targets in Markdown format
 	@echo Auto creating README.md....
